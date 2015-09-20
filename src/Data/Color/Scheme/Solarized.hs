@@ -1,32 +1,65 @@
 module Data.Color.Scheme.Solarized
     ( Value(..)
-    , Color(..)
-    , Intensity(..)
+    , base03    
+    , base02    
+    , base01    
+    , base00    
+    , base0     
+    , base1     
+    , base2     
+    , base3     
+    , yellow    
+    , orange    
+    , red       
+    , magenta   
+    , violet    
+    , blue      
+    , cyan      
+    , green     
     ) where
 
 -- base
 import Data.Word
+import Data.Word.Word24
+import Data.Word.Word24.Util
+import Text.Printf
+import System.Terminal.Ansi
 
--- hackage
-import __ansi-terminal__
-import __color__
-
--- other
-import __x24-bit__
-
-data Color = Black | Red | Green | Yellow | Blue | Magenta | Cyan | White
-    deriving (Eq, Enum, Show, Read)
-
-data Intensity = Normal | Bright
-
-data Value = Value { hex :: Word24
-                   , tCo_16 :: (Intensity, Color)
+data Value = Value { trueColor :: Colour Word8
+                   , tCo_16 :: (ColorIntensity, Color)
                    , tCo_8 :: Color
-                   , xterm256
-                   , lab :: Color
+                   , xterm256 :: Word8
+                   , xterm256_approx :: Colour Word8
+                   , lab :: ()
                    }
 
--- VALUES
+curry3 :: ((a, b, c) -> d) -> a -> b -> c -> d
+curry3 f a b c = f (a, b, c)
+
+uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
+uncurry3 f (a, b, c) = f a b c
+
+fromHex :: Word24 -> Colour Word8
+fromHex = uncurry RGB . toOctets
+
+base03    = Value (fromHex 0x002b36) (toEnum  8) (toEnum 4) 234 (fromHex 0x1c1c1c)
+base02    = Value (fromHex 0x073642) (toEnum  0) (toEnum 4) 235 (fromHex 0x262626)
+base01    = Value (fromHex 0x586e75) (toEnum 10) (toEnum 7) 240 (fromHex 0x585858)
+base00    = Value (fromHex 0x657b83) (toEnum 11) (toEnum 7) 241 (fromHex 0x626262)
+base0     = Value (fromHex 0x839496) (toEnum 12) (toEnum 6) 244 (fromHex 0x808080)
+base1     = Value (fromHex 0x93a1a1) (toEnum 14) (toEnum 4) 245 (fromHex 0x8a8a8a)
+base2     = Value (fromHex 0xeee8d5) (toEnum  7) (toEnum 7) 254 (fromHex 0xe4e4e4)
+base3     = Value (fromHex 0xfdf6e3) (toEnum 15) (toEnum 7) 230 (fromHex 0xffffd7)
+yellow    = Value (fromHex 0xb58900) (toEnum  3) (toEnum 3) 136 (fromHex 0xaf8700)
+orange    = Value (fromHex 0xcb4b16) (toEnum  9) (toEnum 3) 166 (fromHex 0xd75f00)
+red       = Value (fromHex 0xdc322f) (toEnum  1) (toEnum 1) 160 (fromHex 0xd70000)
+magenta   = Value (fromHex 0xd33682) (toEnum  5) (toEnum 5) 125 (fromHex 0xaf005f)
+violet    = Value (fromHex 0x6c71c4) (toEnum 13) (toEnum 5)  61 (fromHex 0x5f5faf)
+blue      = Value (fromHex 0x268bd2) (toEnum  4) (toEnum 4)  33 (fromHex 0x0087ff)
+cyan      = Value (fromHex 0x2aa198) (toEnum  6) (toEnum 6)  37 (fromHex 0x00afaf)
+green     = Value (fromHex 0x859900) (toEnum  2) (toEnum 2)  64 (fromHex 0x5f8700)
+
+-- OFFICIAL VALUES
 
 -- base03    #002b36  8/4 brblack  234 #1c1c1c 15 -12 -12   0  43  54 193 100  21
 -- base02    #073642  0/4 black    235 #262626 20 -12 -12   7  54  66 192  90  26
@@ -44,7 +77,3 @@ data Value = Value { hex :: Word24
 -- blue      #268bd2  4/4 blue      33 #0087ff 55 -10 -45  38 139 210 205  82  82
 -- cyan      #2aa198  6/6 cyan      37 #00afaf 60 -35 -05  42 161 152 175  74  63
 -- green     #859900  2/2 green     64 #5f8700 60 -20  65 133 153   0  68 100  60
-
--- UTIL
-
-hex2rgb :: Word24 -> (Word8, Word8, Word8)
