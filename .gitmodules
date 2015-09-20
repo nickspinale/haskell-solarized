@@ -1,0 +1,3 @@
+[submodule "24-bit"]
+	path = 24-bit
+	url = https://github.com/nickspinale/24-bit.git

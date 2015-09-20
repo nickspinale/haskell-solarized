@@ -18,20 +18,30 @@ module Data.Color.Scheme.Solarized
     , green     
     ) where
 
--- base
+import Data.Colour
+import Data.Colour.SRGB
 import Data.Word
 import Data.Word.Word24
-import Data.Word.Word24.Util
-import Text.Printf
-import System.Terminal.Ansi
+import Data.Word.Word24.Utils
+import System.Console.ANSI
 
-data Value = Value { trueColor :: Colour Word8
-                   , tCo_16 :: (ColorIntensity, Color)
+data Value = Value { trueColor :: RGB Word8
+                   , tCo_16 :: Color16
                    , tCo_8 :: Color
                    , xterm256 :: Word8
-                   , xterm256_approx :: Colour Word8
+                   , xterm256_approx :: RGB Word8
                    , lab :: ()
                    }
+
+data Color16 = Color16 ColorIntensity Color
+
+instance Enum Color16 where
+
+    toEnum i = let (div, mod) = divMod i 8
+                 in Color16 (toEnum div) (toEnum mod)
+
+    fromEnum (Color16 i c) = fromEnum i * 8 + fromEnum c
+
 
 curry3 :: ((a, b, c) -> d) -> a -> b -> c -> d
 curry3 f a b c = f (a, b, c)
@@ -39,8 +49,8 @@ curry3 f a b c = f (a, b, c)
 uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
 uncurry3 f (a, b, c) = f a b c
 
-fromHex :: Word24 -> Colour Word8
-fromHex = uncurry RGB . toOctets
+fromHex :: Word24 -> RGB Word8
+fromHex = uncurry3 RGB . toOctets
 
 base03    = Value (fromHex 0x002b36) (toEnum  8) (toEnum 4) 234 (fromHex 0x1c1c1c)
 base02    = Value (fromHex 0x073642) (toEnum  0) (toEnum 4) 235 (fromHex 0x262626)
