@@ -1,5 +1,6 @@
 module Data.Color.Scheme.Solarized
     ( Value(..)
+    , Color16(..)
     , base03    
     , base02    
     , base01    
